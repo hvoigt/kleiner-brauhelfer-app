@@ -1,4 +1,4 @@
-#include <QApplication>
+#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QSettings>
 #ifdef Q_OS_ANDROID
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     qputenv("QT_ANDROID_ENABLE_WORKAROUND_TO_DISABLE_PREDICTIVE_TEXT", "1");
   #endif
 
-    QApplication app(argc, argv);
+    QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
 
     app.setOrganizationName(QStringLiteral(ORGANIZATION));

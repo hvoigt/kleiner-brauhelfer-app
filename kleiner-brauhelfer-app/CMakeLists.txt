@@ -135,7 +135,7 @@ qt_add_qml_module(${PROJECT_NAME}
 # Add the resource files
 qt_add_resources(${PROJECT_NAME}
     PREFIX "/"
-    FILES qtquickcontrols2.conf android/AndroidManifest.xml
+    FILES android/AndroidManifest.xml
 )
 
 # Add the translation files

@@ -4,13 +4,15 @@ import QtQuick.Layouts
 import QtQuick.Controls.Material
 
 Drawer {
+    id: drawer
     property alias model: repeater.model
 
     z: 1
     Material.elevation: 4
-    padding: 0
     width: layout.width
-    height: app.height
+    height: parent.height
+    topPadding: 0
+    rightPadding: 0
 
     Flickable {
         anchors.fill: parent
@@ -28,6 +30,7 @@ Drawer {
             Rectangle {
                 Layout.preferredWidth: childrenRect.width
                 Layout.preferredHeight: childrenRect.height
+                topRightRadius: 12
                 color: Material.primary
                 MouseArea {
                    anchors.fill: parent
@@ -35,6 +38,8 @@ Drawer {
                 }
                 RowLayout {
                     Image {
+                        Layout.topMargin: drawer.SafeArea.margins.top + 4
+                        Layout.bottomMargin: 4
                         width: 48 * app.settings.scalingfactor
                         height: width
                         source: "qrc:/images/logo.png"
