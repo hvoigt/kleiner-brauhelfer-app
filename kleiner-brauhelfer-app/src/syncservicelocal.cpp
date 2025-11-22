@@ -1,52 +1,75 @@
 #include "syncservicelocal.h"
 #include <QFile>
-#ifdef Q_OS_ANDROID
-  #include <QtCore/private/qandroidextras_p.h>
+#ifndef Q_OS_ANDROID
+  #include <QUrl>
+  #include <QDir>
 #endif
+
+QString SyncServiceLocal::toLocalFile(const QString &url)
+{
+  #ifdef Q_OS_ANDROID
+    return url;
+  #else
+    return QDir::toNativeSeparators(QUrl(url).toLocalFile());
+  #endif
+}
 
 SyncServiceLocal::SyncServiceLocal(QSettings *settings) :
     SyncService(settings)
 {
+  #ifdef Q_OS_ANDROID
+    setFilePath(cacheFilePath(QStringLiteral("_kb_daten_.sqlite")));
+  #else
     setFilePath(_settings->value("SyncService/local/DatabasePath").toString());
+  #endif
 }
 
 SyncServiceLocal::SyncServiceLocal(const QString &filePath) :
     SyncService(nullptr)
 {
+  #ifdef Q_OS_ANDROID
+    setFilePath(cacheFilePath(QStringLiteral("_kb_daten_.sqlite")));
+  #else
     setFilePath(filePath);
+  #endif
 }
 
 bool SyncServiceLocal::synchronize(SyncDirection direction)
 {
-  #ifdef Q_OS_ANDROID
-    // check permissions
-    if (QtAndroidPrivate::androidSdkVersion() < 29)
-    {
-        if (QtAndroidPrivate::checkPermission(QStringLiteral("android.permission.READ_EXTERNAL_STORAGE")).result() != QtAndroidPrivate::Authorized)
-            QtAndroidPrivate::requestPermission(QStringLiteral("android.permission.READ_EXTERNAL_STORAGE")).result();
-        if (QtAndroidPrivate::checkPermission(QStringLiteral("android.permission.WRITE_EXTERNAL_STORAGE")).result() != QtAndroidPrivate::Authorized)
-            QtAndroidPrivate::requestPermission(QStringLiteral("android.permission.WRITE_EXTERNAL_STORAGE")).result();
-    }
-    else
-    {
-        if (QtAndroidPrivate::checkPermission(QStringLiteral("android.permission.MANAGE_EXTERNAL_STORAGE")).result() != QtAndroidPrivate::Authorized)
-            QtAndroidPrivate::requestPermission(QStringLiteral("android.permission.MANAGE_EXTERNAL_STORAGE")).result();
-        if(!QJniObject::callStaticMethod<jboolean>("android/os/Environment", "isExternalStorageManager"))
-        {
-            QJniObject filepermit = QJniObject::getStaticObjectField("android/provider/Settings", "ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION", "Ljava/lang/String;");
-            QJniObject pkgName = QJniObject::fromString(QStringLiteral("package:org.kleinerbrauhelfer.app"));
-            QJniObject parsedUri = QJniObject::callStaticObjectMethod("android/net/Uri", "parse", "(Ljava/lang/String;)Landroid/net/Uri;", pkgName.object<jstring>());
-            QJniObject intent("android/content/Intent", "(Ljava/lang/String;Landroid/net/Uri;)V", filepermit.object<jstring>(), parsedUri.object());
-            QtAndroidPrivate::startActivity(intent, 0);
-        }
-    }
-  #endif
-    if (QFile::exists(getFilePath()))
+    if (QFile::exists(filePathLocal()))
     {
         if (direction == SyncDirection::Download)
+        {
+          #ifdef Q_OS_ANDROID
+            QFile srcFile(filePathLocal());
+            if (!srcFile.open(QIODevice::ReadOnly))
+                return false;
+            QFile dstFile(getFilePath());
+            if (dstFile.open(QIODevice::WriteOnly))
+            {
+                dstFile.write(srcFile.readAll());
+                dstFile.close();
+            }
+            srcFile.close();
+          #endif
             setState(SyncState::UpToDate);
+        }
         else
+        {
+          #ifdef Q_OS_ANDROID
+            QFile srcFile(getFilePath());
+            if (!srcFile.open(QIODevice::ReadOnly))
+                return false;
+            QFile dstFile(filePathLocal());
+            if (dstFile.open(QIODevice::WriteOnly))
+            {
+                dstFile.write(srcFile.readAll());
+                dstFile.close();
+            }
+            srcFile.close();
+          #endif
             setState(SyncState::Updated);
+        }
         return true;
     }
     else
@@ -58,16 +81,17 @@ bool SyncServiceLocal::synchronize(SyncDirection direction)
 
 QString SyncServiceLocal::filePathLocal() const
 {
-    return getFilePath();
+    return _settings->value("SyncService/local/DatabasePath").toString();
 }
 
 void SyncServiceLocal::setFilePathLocal(const QString &filePath)
 {
     if (filePathLocal() != filePath)
     {
+      #ifndef Q_OS_ANDROID
         setFilePath(filePath);
-        if (_settings)
-            _settings->setValue("SyncService/local/DatabasePath", filePath);
+      #endif
+        _settings->setValue("SyncService/local/DatabasePath", filePath);
         emit filePathLocalChanged(filePath);
     }
 }

@@ -6,7 +6,6 @@
 #include "brauhelfer.h"
 #include "biercalc.h"
 #include "syncservicemanager.h"
-#include "qmlutils.h"
 #include "proxymodel.h"
 #include "proxymodelrohstoff.h"
 #include "proxymodelsud.h"
@@ -16,7 +15,6 @@ static Brauhelfer *bh;
 static SudObject *sud;
 static BierCalc *bierCalc;
 static SyncServiceManager *syncMan;
-static QmlUtils *utils;
 
 int main(int argc, char *argv[])
 {
@@ -40,7 +38,6 @@ int main(int argc, char *argv[])
     bh = new Brauhelfer();
     sud = new SudObject(bh);
     bierCalc = new BierCalc();
-    utils = new QmlUtils();
 
     // register classes to QML
     qmlRegisterSingletonInstance<LanguageSelector>("languageSelector", 1, 0, "LanguageSelector", langSel);
@@ -48,7 +45,6 @@ int main(int argc, char *argv[])
     qmlRegisterSingletonInstance<SudObject>("brauhelfer", 1, 0, "Sud", sud);
     qmlRegisterSingletonInstance<BierCalc>("brauhelfer", 1, 0, "BierCalc", bierCalc);
     qmlRegisterSingletonInstance<SyncServiceManager>("brauhelfer", 1, 0, "SyncService", syncMan);
-    qmlRegisterSingletonInstance<QmlUtils>("qmlutils", 1, 0, "Utils", utils);
     qmlRegisterType<ProxyModel>("ProxyModel", 1, 0, "ProxyModel");
     qmlRegisterType<ProxyModelRohstoff>("ProxyModelRohstoff", 1, 0, "ProxyModelRohstoff");
     qmlRegisterType<ProxyModelSud>("ProxyModelSud", 1, 0, "ProxyModelSud");

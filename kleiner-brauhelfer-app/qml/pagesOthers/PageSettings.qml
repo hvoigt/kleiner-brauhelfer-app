@@ -5,7 +5,6 @@ import Qt5Compat.GraphicalEffects
 import QtQuick.Dialogs
 
 import "../common"
-import qmlutils
 import brauhelfer
 
 PageBase {
@@ -94,11 +93,6 @@ PageBase {
                         Layout.fillWidth: true
                         spacing: 16
                         visible: SyncService.serviceId === SyncService.Local
-                        LabelPrim {
-                            Layout.fillWidth: true
-                            font.italic: true
-                            text: qsTr("Benötigt Berechtigung für den Speicher.")
-                        }
                         RowLayout {
                             Layout.fillWidth: true
                             TextFieldBase {
@@ -134,7 +128,7 @@ PageBase {
                                     id: openDialog
                                     title: qsTr("Pfad zur Datenbank")
                                     onAccepted: {
-                                        tfDatabasePathLocal.text = Utils.toLocalFile(decodeURIComponent(selectedFile))
+                                        tfDatabasePathLocal.text = SyncService.syncServiceLocal.toLocalFile(selectedFile)
                                         SyncService.syncServiceLocal.filePathLocal = tfDatabasePathLocal.text
                                         layout.tryConnect()
                                     }

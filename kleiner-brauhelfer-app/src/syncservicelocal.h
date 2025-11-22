@@ -17,6 +17,13 @@ class SyncServiceLocal : public SyncService
 public:
 
     /**
+     * @brief Returns a string representing a local path from an URL
+     * @param url URL
+     * @return Local file path
+     */
+    Q_INVOKABLE static QString toLocalFile(const QString &url);
+
+    /**
      * @brief Local file synchronization service
      * @param settings Settings
      */

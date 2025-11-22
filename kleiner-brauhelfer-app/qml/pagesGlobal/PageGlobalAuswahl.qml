@@ -5,7 +5,6 @@ import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 
 import "../common"
-import qmlutils
 import brauhelfer
 import ProxyModelSud
 
@@ -223,7 +222,7 @@ PageBase {
                                     layer.enabled: true
                                     layer.effect: ColorOverlay {
                                         cached: true
-                                        color: Utils.toColor(BierCalc.ebcToColor(model.FarbeIst))
+                                        color: "#" + BierCalc.ebcToColor(model.FarbeIst).toString(16).padStart(8,'0')
                                     }
                                 }
                                 Image {
