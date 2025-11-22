@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
-import Qt.labs.platform
+import QtQuick.Dialogs
 import QtCore
 
 import "common"
@@ -283,14 +283,14 @@ ApplicationWindow {
         id: messageDialogGotoSettings
         text: qsTr("Verbindung mit der Datenbank fehlgeschlagen.")
         informativeText: qsTr("Einstellungen überprüfen.")
-        onOkClicked: navPane.goSettings()
+        onAccepted: navPane.goSettings()
     }
 
     // message dialog for unsupported database version
     MessageDialog {
         id: messageDialogUnsupportedDatabaseVersion
         text: qsTr("Diese Datenbank wird nicht unterstüzt.")
-        onOkClicked: navPane.goSettings()
+        onAccepted: navPane.goSettings()
     }
 
     // message dialog for unsupported database version
@@ -305,7 +305,7 @@ ApplicationWindow {
         id: messageDialogQuit
         text: qsTr("Soll das Programm geschlossen werden?")
         buttons: MessageDialog.Ok | MessageDialog.Cancel
-        onOkClicked: Qt.quit()
+        onAccepted: Qt.quit()
     }
 
     // message dialog to ask for save and quit
@@ -313,8 +313,16 @@ ApplicationWindow {
         id: messageDialogQuitSave
         text: qsTr("Änderungen vor dem Schliessen speichern?")
         buttons: MessageDialog.Save | MessageDialog.Discard | MessageDialog.Cancel
-        onSaveClicked: app.saveAndQuit()
-        onDiscardClicked: Qt.quit()
+        onButtonClicked: function (button, role) {
+            switch (button) {
+                case MessageDialog.Save:
+                    app.saveAndQuit()
+                    break;
+                case MessageDialog.Discard:
+                    Qt.quit()
+                    break;
+                }
+            }
     }
 
     // header

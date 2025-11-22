@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
-import Qt.labs.platform
+import QtQuick.Dialogs
 
 import "../common"
 import brauhelfer
@@ -40,7 +40,13 @@ PageBase {
             id: messageDialog
             text: qsTr("Verwendete Rohstoffe vom Bestand abziehen?")
             buttons: MessageDialog.Yes | MessageDialog.No
-            onYesClicked: Sud.brauzutatenAbziehen()
+            onButtonClicked: function (button, role) {
+                switch (button) {
+                    case MessageDialog.Yes:
+                        Sud.brauzutatenAbziehen()
+                        break;
+                    }
+                }
         }
 
         ColumnLayout {

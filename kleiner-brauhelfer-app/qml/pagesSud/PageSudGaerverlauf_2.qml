@@ -4,7 +4,6 @@ import QtQuick.Layouts
 import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 import QtCharts
-import Qt.labs.platform
 
 import "../common"
 import brauhelfer

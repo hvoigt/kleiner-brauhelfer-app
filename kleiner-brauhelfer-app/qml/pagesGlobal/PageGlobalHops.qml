@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material
-import Qt.labs.platform
+import QtQuick.Dialogs
 
 import "../common"
 import brauhelfer
