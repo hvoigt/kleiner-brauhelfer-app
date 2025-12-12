@@ -133,18 +133,26 @@ ChartView {
     function buildAxis(series, axisY) {
         var index = 0
         var pt
-        var minX, maxX, minY, maxY
+        var minX = Date.now()
+        var maxX = Date.now()
+        var minY = 0
+        var maxY = 1
 
-        // first point: x
-        pt = series.at(index)
-        minX = pt.x;
-        maxX = pt.x + 1; // add one day
+        if (series.count > 0) {
+            // first point: x
+            pt = series.at(index)
+            minX = pt.x;
+            maxX = pt.x;
 
-        // first point: y
-        minY = Math.floor(pt.y)
-        maxY = Math.ceil(pt.y) + 1
+            // first point: y
+            minY = Math.floor(pt.y)
+            maxY = Math.ceil(pt.y) + 1
+        }
+
+        if (minX === maxX)
+            maxX = minX + 24*3600*1000
         if (minY === maxY)
-            maxY = minY + 1 // add 1
+            maxY = minY + 1
 
         for (index = 1; index < series.count; ++index) {
             pt = series.at(index)

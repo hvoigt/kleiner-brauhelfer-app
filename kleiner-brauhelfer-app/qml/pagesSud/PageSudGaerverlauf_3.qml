@@ -33,20 +33,20 @@ PageBase {
             VXYModelMapper {
                 model: listView.model
                 series: chart.series1
-                xColumn: model.fieldIndex("Zeitstempel")
-                yColumn: model.fieldIndex("CO2")
+                xColumn: 2 //model.fieldIndex("Zeitstempel")
+                yColumn: 5 //model.fieldIndex("CO2")
             }
             VXYModelMapper {
                 model: listView.model
                 series: chart.series2
-                xColumn: model.fieldIndex("Zeitstempel")
-                yColumn: model.fieldIndex("Druck")
+                xColumn: 2 //model.fieldIndex("Zeitstempel")
+                yColumn: 3 //model.fieldIndex("Druck")
             }
             VXYModelMapper {
                 model: listView.model
                 series: chart.series3
-                xColumn: model.fieldIndex("Zeitstempel")
-                yColumn: model.fieldIndex("Temp")
+                xColumn: 2 //model.fieldIndex("Zeitstempel")
+                yColumn: 4 //model.fieldIndex("Temp")
             }
         }
 

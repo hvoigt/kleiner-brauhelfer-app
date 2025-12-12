@@ -81,4 +81,11 @@ android {
         targetSdkVersion qtTargetSdkVersion
         ndk.abiFilters = qtTargetAbiList.split(",")
     }
+	
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+        }
+    }
 }
