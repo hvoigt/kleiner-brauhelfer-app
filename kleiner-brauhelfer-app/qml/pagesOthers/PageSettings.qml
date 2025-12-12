@@ -28,6 +28,9 @@ PageBase {
             function tryConnect() {
                 switch (SyncService.serviceId)
                 {
+                case SyncService.Demo:
+                    app.connect()
+                    break;
                 case SyncService.Local:
                     if (SyncService.syncServiceLocal.filePathLocal !== "")
                         app.connect()
@@ -69,10 +72,11 @@ PageBase {
                         Layout.fillWidth: true
                         ComboBoxBase {
                             Layout.fillWidth: true
-                            model: [qsTr("Lokal"), qsTr("Dropbox"), qsTr("WebDav"), qsTr("Google Drive")]
+                            model: [qsTr("Demo"),qsTr("Lokal"), qsTr("Dropbox"), qsTr("WebDav"), qsTr("Google Drive")]
                             currentIndex: SyncService.serviceId
                             onCurrentIndexChanged: {
                                 if (activeFocus) {
+                                    Brauhelfer.disconnectDatabase()
                                     SyncService.serviceId = currentIndex
                                     layout.tryConnect()
                                 }

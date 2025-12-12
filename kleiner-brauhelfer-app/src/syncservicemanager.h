@@ -15,6 +15,7 @@ class SyncServiceManager : public QObject
     Q_PROPERTY(SyncServiceId serviceId READ serviceId WRITE setServiceId NOTIFY serviceIdChanged)
     Q_PROPERTY(QString filePath READ filePath NOTIFY filePathChanged)
     Q_PROPERTY(SyncService::SyncState syncState READ syncState NOTIFY syncStateChanged)
+    Q_PROPERTY(SyncService* syncServiceDemo MEMBER mSyncServiceDemo CONSTANT)
     Q_PROPERTY(SyncService* syncServiceLocal MEMBER mSyncServiceLocal CONSTANT)
     Q_PROPERTY(SyncService* syncServiceDropbox MEMBER mSyncServiceDropbox CONSTANT)
     Q_PROPERTY(SyncService* syncServiceGoogle MEMBER mSyncServiceGoogle CONSTANT)
@@ -45,6 +46,7 @@ public:
      */
     enum SyncServiceId
     {
+        Demo,
         Local,
         Dropbox,
         WebDav,
@@ -151,6 +153,7 @@ private:
     QSettings* mSettings;
     SyncServiceId mServiceId;
     QList<SyncService*> mServices;
+    SyncService* mSyncServiceDemo;
     SyncService* mSyncServiceLocal;
     SyncService* mSyncServiceDropbox;
     SyncService* mSyncServiceGoogle;

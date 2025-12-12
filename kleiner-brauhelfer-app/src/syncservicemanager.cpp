@@ -1,5 +1,6 @@
 #include "syncservicemanager.h"
 
+#include "syncservicedemo.h"
 #include "syncservicelocal.h"
 #include "syncservicedropbox.h"
 #include "syncservicegoogle.h"
@@ -24,6 +25,9 @@ SyncServiceManager::SyncServiceManager(QSettings *settings, QObject *parent) :
     QObject(parent),
     mSettings(settings)
 {
+    mSyncServiceDemo = new SyncServiceDemo(mSettings);
+    connect(mSyncServiceDemo, &SyncService::message, this, &SyncServiceManager::message);
+    mServices.append(mSyncServiceDemo);
     mSyncServiceLocal = new SyncServiceLocal(mSettings);
     connect(mSyncServiceLocal, &SyncService::message, this, &SyncServiceManager::message);
     mServices.append(mSyncServiceLocal);
@@ -36,7 +40,7 @@ SyncServiceManager::SyncServiceManager(QSettings *settings, QObject *parent) :
     mSyncServiceGoogle = new SyncServiceGoogle(mSettings);
     connect(mSyncServiceGoogle, &SyncService::message, this, &SyncServiceManager::message);
     mServices.append(mSyncServiceGoogle);
-    setServiceId((SyncServiceId)mSettings->value("SyncService/Id", 0).toInt());
+    setServiceId((SyncServiceId)mSettings->value("SyncService/Id", SyncServiceId::Demo).toInt());
 }
 
 SyncServiceManager::~SyncServiceManager()
@@ -53,7 +57,7 @@ SyncService* SyncServiceManager::service() const
 SyncService* SyncServiceManager::service(SyncServiceId id) const
 {
     if (id < 0 || id >= mServices.count())
-        id = SyncServiceId::Local;
+        id = SyncServiceId::Demo;
     return mServices.at(id);
 }
 
@@ -65,7 +69,7 @@ SyncServiceManager::SyncServiceId SyncServiceManager::serviceId() const
 void SyncServiceManager::setServiceId(SyncServiceId id)
 {
     if (id < 0 || id >= mServices.count())
-        id = SyncServiceId::Local;
+        id = SyncServiceId::Demo;
     if (mServiceId != id)
     {
         mServiceId = id;

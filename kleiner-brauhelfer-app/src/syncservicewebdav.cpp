@@ -12,7 +12,7 @@ SyncServiceWebDav::SyncServiceWebDav(QSettings *settings) :
 {
     _netManager = new QNetworkAccessManager(this);
     connect(_netManager, &QNetworkAccessManager::authenticationRequired, this, &SyncServiceWebDav::authenticationRequired);
-    setFilePath(cacheFilePath(QStringLiteral("kb_daten.sqlite")));
+    setFilePath(cacheFilePath(QStringLiteral("__kb_daten_webdav__.sqlite")));
 }
 
 SyncServiceWebDav::~SyncServiceWebDav()
@@ -175,7 +175,6 @@ void SyncServiceWebDav::setFilePathServer(const QString &filePath)
     if (getFilePathServer() != filePath)
     {
         _settings->setValue("SyncService/webdav/DatabasePath", filePath);
-        setFilePath(cacheFilePath(QStringLiteral("kb_daten.sqlite")));
         emit filePathServerChanged(filePath);
     }
 }
@@ -206,4 +205,10 @@ void SyncServiceWebDav::setPassword(const QString& password)
         _settings->setValue("SyncService/webdav/password", password);
         emit passwordChanged(password);
     }
+}
+
+void SyncServiceWebDav::clearCache()
+{
+    QFile file(getFilePath());
+    file.remove();
 }

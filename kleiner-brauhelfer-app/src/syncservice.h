@@ -73,7 +73,7 @@ public:
      * @brief Clears the whole cache
      * @note All local files will be deleted
      */
-    Q_INVOKABLE void clearCache();
+    Q_INVOKABLE virtual void clearCache();
 
 signals:
 

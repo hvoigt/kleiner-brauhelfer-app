@@ -18,7 +18,7 @@ SyncServiceLocal::SyncServiceLocal(QSettings *settings) :
     SyncService(settings)
 {
   #ifdef Q_OS_ANDROID
-    setFilePath(cacheFilePath(QStringLiteral("_kb_daten_.sqlite")));
+    setFilePath(cacheFilePath(QStringLiteral("__kb_daten_local__.sqlite")));
   #else
     setFilePath(_settings->value("SyncService/local/DatabasePath").toString());
   #endif
@@ -28,7 +28,7 @@ SyncServiceLocal::SyncServiceLocal(const QString &filePath) :
     SyncService(nullptr)
 {
   #ifdef Q_OS_ANDROID
-    setFilePath(cacheFilePath(QStringLiteral("_kb_daten_.sqlite")));
+    setFilePath(cacheFilePath(QStringLiteral("__kb_daten_local__.sqlite")));
   #else
     setFilePath(filePath);
   #endif
@@ -94,4 +94,12 @@ void SyncServiceLocal::setFilePathLocal(const QString &filePath)
         _settings->setValue("SyncService/local/DatabasePath", filePath);
         emit filePathLocalChanged(filePath);
     }
+}
+
+void SyncServiceLocal::clearCache()
+{
+  #ifdef Q_OS_ANDROID
+    QFile file(getFilePath());
+    file.remove();
+  #endif
 }

@@ -67,6 +67,12 @@ public:
      */
     void setPassword(const QString& password);
 
+    /**
+     * @brief Clears the whole cache
+     * @note All local files will be deleted
+     */
+    Q_INVOKABLE virtual void clearCache() Q_DECL_OVERRIDE;
+
 signals:
 
     /**

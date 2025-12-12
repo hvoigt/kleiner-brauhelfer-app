@@ -124,6 +124,7 @@ qt_add_executable(${PROJECT_NAME}
     ${SOURCES}
     ${HEADERS}
     images.qrc
+    data.qrc
 )
 
 # Add the qml files
