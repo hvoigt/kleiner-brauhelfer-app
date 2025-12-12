@@ -34,8 +34,9 @@ void ProxyModelSud::setFilterMerkliste(bool value)
 {
     if (mFilterMerkliste != value)
     {
+        beginFilterChange();
         mFilterMerkliste = value;
-        invalidateRowsFilter();
+        endFilterChange(Direction::Rows);
     }
 }
 
@@ -48,8 +49,9 @@ void ProxyModelSud::setFilterStatus(FilterStatus status)
 {
     if (mFilterStatus != status)
     {
+        beginFilterChange();
         mFilterStatus = status;
-        invalidateRowsFilter();
+        endFilterChange(Direction::Rows);
     }
 }
 
@@ -62,8 +64,9 @@ void ProxyModelSud::setFilterDate(bool value)
 {
     if (mFilterDate != value)
     {
+        beginFilterChange();
         mFilterDate = value;
-        invalidateRowsFilter();
+        endFilterChange(Direction::Rows);
     }
 }
 
@@ -76,8 +79,9 @@ void ProxyModelSud::setFilterMinimumDate(const QDateTime &dt)
 {
     if (mMinDate != dt)
     {
+        beginFilterChange();
         mMinDate = dt;
-        invalidateRowsFilter();
+        endFilterChange(Direction::Rows);
     }
 }
 
@@ -90,8 +94,9 @@ void ProxyModelSud::setFilterMaximumDate(const QDateTime &dt)
 {
     if (mMaxDate != dt)
     {
+        beginFilterChange();
         mMaxDate = dt;
-        invalidateRowsFilter();
+        endFilterChange(Direction::Rows);
     }
 }
 
@@ -104,8 +109,9 @@ void ProxyModelSud::setFilterText(const QString& text)
 {
     if (mFilterText != text)
     {
+        beginFilterChange();
         mFilterText = text;
-        invalidateRowsFilter();
+        endFilterChange(Direction::Rows);
     }
 }
 
@@ -118,8 +124,9 @@ void ProxyModelSud::setFilterKategorie(const QString& kategorie)
 {
     if (mFilterKategorie != kategorie)
     {
+        beginFilterChange();
         mFilterKategorie = kategorie;
-        invalidateRowsFilter();
+        endFilterChange(Direction::Rows);
     }
 }
 
@@ -132,8 +139,9 @@ void ProxyModelSud::setFilterAnlage(const QString& anlage)
 {
     if (mFilterAnlage != anlage)
     {
+        beginFilterChange();
         mFilterAnlage = anlage;
-        invalidateRowsFilter();
+        endFilterChange(Direction::Rows);
     }
 }
 
@@ -305,15 +313,15 @@ void ProxyModelSud::saveSetting(QSettings* settings)
     settings->setValue("filterSudAnlage", filterAnlage());
 }
 
-void ProxyModelSud::loadSettings(QSettings* settings)
+void ProxyModelSud::loadSettings(QSettings* settings, const QVariantMap& default_values)
 {
-    setFilterStatus(static_cast<ProxyModelSud::FilterStatus>(settings->value("filterSudStatus", ProxyModelSud::Alle).toInt()));
-    setFilterMerkliste(settings->value("filterSudMerkliste", false).toBool());
-    setFilterDate(settings->value("filterSudDate", false).toBool());
-    QDate minDate = settings->value("filterSudDateVon", QDate::currentDate().addYears(-1)).toDate();
-    QDate maxDate = settings->value("filterSudDateBis", QDate::currentDate()).toDate();
+    setFilterStatus(static_cast<ProxyModelSud::FilterStatus>(settings->value("filterSudStatus", default_values.contains("filterSudStatus") ? default_values["filterSudStatus"] : ProxyModelSud::Alle).toInt()));
+    setFilterMerkliste(settings->value("filterSudMerkliste", default_values.contains("filterSudMerkliste") ? default_values["filterSudMerkliste"] : false).toBool());
+    setFilterDate(settings->value("filterSudDate", default_values.contains("filterSudDate") ? default_values["filterSudDate"] : false).toBool());
+    QDate minDate = settings->value("filterSudDateVon", default_values.contains("filterSudDateVon") ? default_values["filterSudDateVon"] : QDate::currentDate().addYears(-1)).toDate();
+    QDate maxDate = settings->value("filterSudDateBis", default_values.contains("filterSudDateBis") ? default_values["filterSudDateBis"] : QDate::currentDate()).toDate();
     setFilterMinimumDate(QDateTime(minDate, QTime(1,0,0)));
     setFilterMaximumDate(QDateTime(maxDate, QTime(23,59,59)));
-    setFilterKategorie(settings->value("filterSudKategorie", "").toString());
-    setFilterAnlage(settings->value("filterSudAnlage", "").toString());
+    setFilterKategorie(settings->value("filterSudKategorie", default_values.contains("filterSudKategorie") ? default_values["filterSudKategorie"] : "").toString());
+    setFilterAnlage(settings->value("filterSudAnlage", default_values.contains("filterSudAnlage") ? default_values["filterSudAnlage"] : "").toString());
 }
