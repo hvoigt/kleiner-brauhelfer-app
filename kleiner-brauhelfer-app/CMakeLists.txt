@@ -42,7 +42,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 
 # Enables building multi-ABI packages for Android
-set(QT_ANDROID_BUILD_ALL_ABIS TRUE)
+if(ANDROID)
+    set(QT_ANDROID_BUILD_ALL_ABIS TRUE)
+endif()
 
 # Source files
 file(GLOB SOURCES
@@ -134,11 +136,13 @@ qt_add_qml_module(${PROJECT_NAME}
     RESOURCE_PREFIX "/"
 )
 
-# Add the resource files
-qt_add_resources(${PROJECT_NAME}
-    PREFIX "/"
-    FILES android/AndroidManifest.xml
-)
+# Add the resource files (Android-specific)
+if(ANDROID)
+    qt_add_resources(${PROJECT_NAME}
+        PREFIX "/"
+        FILES android/AndroidManifest.xml
+    )
+endif()
 
 # Add the translation files
 qt_add_translations(${PROJECT_NAME}
@@ -170,14 +174,33 @@ else()
     message(FATAL_ERROR "BUILD_TYPE must be either STATIC or SHARED" )
 endif()
 
-# Append path to a custom Android package template
-set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY
-    QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android
-)
+# Android-specific properties
+if(ANDROID)
+    # Append path to a custom Android package template
+    set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY
+        QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android
+    )
 
-# Set Android version code and version name
-set_target_properties(${PROJECT_NAME} PROPERTIES QT_ANDROID_VERSION_CODE ${VERSION_CODE})
-set_target_properties(${PROJECT_NAME} PROPERTIES QT_ANDROID_VERSION_NAME ${VERSION})
+    # Set Android version code and version name
+    set_target_properties(${PROJECT_NAME} PROPERTIES QT_ANDROID_VERSION_CODE ${VERSION_CODE})
+    set_target_properties(${PROJECT_NAME} PROPERTIES QT_ANDROID_VERSION_NAME ${VERSION})
+endif()
+
+# iOS-specific properties
+if(IOS)
+    # Enable iOS bundle creation
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_GUI_IDENTIFIER "com.${ORGANIZATION}.${TARGET}"
+        MACOSX_BUNDLE_BUNDLE_VERSION ${VERSION}
+        MACOSX_BUNDLE_SHORT_VERSION_STRING ${VERSION}
+        MACOSX_BUNDLE_BUNDLE_NAME "${TARGET}"
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.${ORGANIZATION}.${TARGET}"
+        XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
+        XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "13.0"
+        XCODE_ATTRIBUTE_CODE_SIGN_STYLE "Automatic"
+    )
+endif()
 
 # Link the core and Qt libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
