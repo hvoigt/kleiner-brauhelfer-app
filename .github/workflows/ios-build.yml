@@ -28,39 +28,54 @@ jobs:
         cache: true
 
     - name: Import Code Signing Certificate (Optional)
-      if: ${{ secrets.APPLE_CERTIFICATE_BASE64 != '' }}
+      env:
+        APPLE_CERT: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+        APPLE_CERT_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        APPLE_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}
       run: |
-        # Create temporary keychain
-        security create-keychain -p actions build.keychain
-        security default-keychain -s build.keychain
-        security unlock-keychain -p actions build.keychain
-        security set-keychain-settings -t 3600 -u build.keychain
+        # Only proceed if certificate is provided
+        if [ -n "$APPLE_CERT" ]; then
+          echo "Setting up code signing..."
 
-        # Import certificate
-        echo "${{ secrets.APPLE_CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
-        security import certificate.p12 -k build.keychain -P "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" -T /usr/bin/codesign
-        security set-key-partition-list -S apple-tool:,apple: -s -k actions build.keychain
+          # Create temporary keychain
+          security create-keychain -p actions build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p actions build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
 
-        # Import provisioning profile if provided
-        if [ -n "${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}" ]; then
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+          # Import certificate
+          echo "$APPLE_CERT" | base64 --decode > certificate.p12
+          security import certificate.p12 -k build.keychain -P "$APPLE_CERT_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k actions build.keychain
+
+          # Import provisioning profile if provided
+          if [ -n "$APPLE_PROFILE" ]; then
+            mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+            echo "$APPLE_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+            echo "Provisioning profile imported"
+          fi
+
+          echo "Code signing configured"
+        else
+          echo "No certificate provided, will build unsigned"
         fi
 
     - name: Configure CMake for iOS
+      env:
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       run: |
         mkdir build-ios
         cd build-ios
 
         # Configure with or without code signing
-        if [ -n "${{ secrets.APPLE_TEAM_ID }}" ]; then
+        if [ -n "$APPLE_TEAM_ID" ]; then
           echo "Configuring with code signing..."
           cmake .. \
             -G Xcode \
             -DCMAKE_SYSTEM_NAME=iOS \
             -DCMAKE_OSX_ARCHITECTURES=arm64 \
             -DCMAKE_OSX_DEPLOYMENT_TARGET=13.0 \
-            -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
+            -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
             -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY="iPhone Developer"
         else
           echo "Configuring without code signing (build only)..."
